@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}{{ action }} Test case{% endblock %}
+{% block content %}
+  <h1>{{ action }} test case for project: {{ project.name }}</h1>
+
+  <form method="post">
+    <label>Title:<br>
+      <input type="text" name="title" required
+             value="{{ testcase.title if testcase is defined else '' }}">
+    </label><br><br>
+
+    <label>Description:<br>
+      <textarea name="description" rows="4" cols="50">{{ testcase.description if testcase is defined else '' }}</textarea>
+    </label><br><br>
+
+    <label>Priority:<br>
+      <select name="priority">
+        {% set current_priority = testcase.priority if testcase is defined else 'medium' %}
+        <option value="low"     {% if current_priority == 'low' %}selected{% endif %}>Low</option>
+        <option value="medium"  {% if current_priority == 'medium' %}selected{% endif %}>Medium</option>
+        <option value="high"    {% if current_priority == 'high' %}selected{% endif %}>High</option>
+        <option value="critical"{% if current_priority == 'critical' %}selected{% endif %}>Critical</option>
+      </select>
+    </label><br><br>
+
+    {% if testcase is defined %}
+      <label>Status:<br>
+        <select name="status">
+          {% set current_status = testcase.status %}
+          <option value="not_run" {% if current_status == 'not_run' %}selected{% endif %}>Not run</option>
+          <option value="pass"    {% if current_status == 'pass' %}selected{% endif %}>Pass</option>
+          <option value="fail"    {% if current_status == 'fail' %}selected{% endif %}>Fail</option>
+          <option value="blocked" {% if current_status == 'blocked' %}selected{% endif %}>Blocked</option>
+        </select>
+      </label><br><br>
+    {% endif %}
+
+    <button type="submit">{{ action }}</button>
+    <a href="{{ url_for('main.list_testcases', project_id=project.id) }}">Cancel</a>
+  </form>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}{{ action }} Project{% endblock %}
+{% block content %}
+  <h1>{{ action }} Project</h1>
+
+  <form method="post">
+    <label>Name:<br>
+      <input type="text" name="name" required
+             value="{{ project.name if project is defined else '' }}">
+    </label><br><br>
+
+    <label>Description:<br>
+      <textarea name="description" rows="4" cols="40">{{ project.description if project is defined else '' }}</textarea>
+    </label><br><br>
+
+    <button type="submit">{{ action }}</button>
+    <a href="{{ url_for('main.list_projects') }}">Cancel</a>
+  </form>
+{% endblock %}

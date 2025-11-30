@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Projects{% endblock %}
+{% block content %}
+<h1>Projects</h1>
+
+<p><a href="{{ url_for('main.create_project') }}">Create new project</a></p>
+
+{% if projects %}
+<table border="1" cellpadding="4">
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+    <th>Created at</th>
+    <th>Actions</th>
+  </tr>
+  {% for project in projects %}
+  <tr>
+    <td>{{ project.name }}</td>
+    <td>{{ project.description }}</td>
+    <td>{{ project.created_at.strftime('%Y-%m-%d') }}</td>
+    <td>
+      <a href="{{ url_for('main.list_testcases', project_id=project.id) }}">Test cases</a> |
+      <a href="{{ url_for('main.list_defects', project_id=project.id) }}">Defects</a> |
+      <a href="{{ url_for('main.edit_project', project_id=project.id) }}">Edit</a>
+      {% if current_user.role == 'admin' %}
+      <form action="{{ url_for('main.delete_project', project_id=project.id) }}" method="post" style="display:inline"
+        onsubmit="return confirm('Delete this project?');">
+        <button type="submit">Delete</button>
+      </form>
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<p>No projects yet.</p>
+{% endif %}
+{% endblock %}

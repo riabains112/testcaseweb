@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Test cases - {{ project.name }}{% endblock %}
+{% block content %}
+  <h1>Test cases for project: {{ project.name }}</h1>
+
+  <p>
+    <a href="{{ url_for('main.create_testcase', project_id=project.id) }}">Create new test case</a> |
+    <a href="{{ url_for('main.list_projects') }}">Back to projects</a>
+  </p>
+
+  {% if testcases %}
+    <table border="1" cellpadding="4">
+      <tr>
+        <th>Title</th>
+        <th>Priority</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+      {% for tc in testcases %}
+        <tr>
+          <td>{{ tc.title }}</td>
+          <td>{{ tc.priority }}</td>
+          <td>{{ tc.status }}</td>
+          <td>
+            <a href="{{ url_for('main.edit_testcase', testcase_id=tc.id) }}">Edit</a>
+            <form action="{{ url_for('main.delete_testcase', testcase_id=tc.id) }}"
+                  method="post"
+                  style="display:inline"
+                  onsubmit="return confirm('Delete this test case?');">
+              <button type="submit">Delete</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+  {% else %}
+    <p>No test cases for this project yet.</p>
+  {% endif %}
+{% endblock %}

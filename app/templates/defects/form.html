@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}{{ action }} defect{% endblock %}
+{% block content %}
+  <h1>{{ action }} defect for project: {{ project.name }}</h1>
+
+  <form method="post">
+    <label>Title:<br>
+      <input type="text" name="title" required
+             value="{{ defect.title if defect is defined else '' }}">
+    </label><br><br>
+
+    <label>Description:<br>
+      <textarea name="description" rows="4" cols="50">{{ defect.description if defect is defined else '' }}</textarea>
+    </label><br><br>
+
+    <label>Severity:<br>
+      {% set current_severity = defect.severity if defect is defined else 'major' %}
+      <select name="severity">
+        <option value="minor"    {% if current_severity == 'minor' %}selected{% endif %}>Minor</option>
+        <option value="major"    {% if current_severity == 'major' %}selected{% endif %}>Major</option>
+        <option value="critical" {% if current_severity == 'critical' %}selected{% endif %}>Critical</option>
+      </select>
+    </label><br><br>
+
+    {% if defect is defined %}
+      <label>Status:<br>
+        {% set current_status = defect.status %}
+        <select name="status">
+          <option value="open"        {% if current_status == 'open' %}selected{% endif %}>Open</option>
+          <option value="in_progress" {% if current_status == 'in_progress' %}selected{% endif %}>In progress</option>
+          <option value="fixed"       {% if current_status == 'fixed' %}selected{% endif %}>Fixed</option>
+          <option value="closed"      {% if current_status == 'closed' %}selected{% endif %}>Closed</option>
+          <option value="rejected"    {% if current_status == 'rejected' %}selected{% endif %}>Rejected</option>
+        </select>
+      </label><br><br>
+    {% endif %}
+
+    <label>Linked test case (optional):<br>
+      <select name="test_case_id">
+        <option value="">-- none --</option>
+        {% for tc in testcases %}
+          {% set selected = '' %}
+          {% if defect is defined and defect.test_case_id == tc.id %}
+            {% set selected = 'selected' %}
+          {% endif %}
+          <option value="{{ tc.id }}" {{ selected }}>{{ tc.title }}</option>
+        {% endfor %}
+      </select>
+    </label><br><br>
+
+    <button type="submit">{{ action }}</button>
+    <a href="{{ url_for('main.list_defects', project_id=project.id) }}">Cancel</a>
+  </form>
+{% endblock %}
