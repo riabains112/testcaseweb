@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_required, current_user
-
+from .permissions import admin_required
 from . import db
 from .models import Project, TestCase, Defect
 
@@ -246,7 +246,7 @@ def edit_defect(defect_id):
     project = defect.project
     testcases = TestCase.query.filter_by(project_id=project.id).all()
 
-    if request.method == "POST":
+       if request.method == "POST":
         title = request.form.get("title")
         description = request.form.get("description")
         severity = request.form.get("severity")
@@ -257,12 +257,18 @@ def edit_defect(defect_id):
             flash("Defect title must be at least 5 characters.", "danger")
             return redirect(url_for("main.edit_defect", defect_id=defect.id))
 
+        # Simple business rule: defect should be fixed before it can be closed
+        if status == "closed" and defect.status != "fixed":
+            flash(
+                "Defect must be marked as 'fixed' before it can be closed.",
+                "warning",
+            )
+            return redirect(url_for("main.edit_defect", defect_id=defect.id))
+
         defect.title = title.strip()
         defect.description = description
         defect.severity = severity
         defect.status = status
-
-        # only allow linking to test cases in same project
         defect.test_case_id = int(test_case_id) if test_case_id else None
 
         db.session.commit()
@@ -293,3 +299,13 @@ def delete_defect(defect_id):
     db.session.commit()
     flash("Defect deleted.", "success")
     return redirect(url_for("main.list_defects", project_id=project_id))
+
+@main_bp.route("/projects/<int:project_id>/delete", methods=["POST"])
+@login_required
+@admin_required
+def delete_project(project_id):
+    project = Project.query.get_or_404(project_id)
+    db.session.delete(project)
+    db.session.commit()
+    flash("Project deleted.", "success")
+    return redirect(url_for("main.list_projects"))

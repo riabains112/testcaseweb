@@ -1,20 +1,38 @@
 {% extends "base.html" %}
 {% block title %}Dashboard{% endblock %}
 {% block content %}
-  <h1>Welcome, {{ user.name }}!</h1>
-  <p>This is the Test Case & Defect Tracker dashboard.</p>
+<h1>Welcome, {{ user.name }}!</h1>
+<p class="muted">
+  This dashboard shows a snapshot of your current test projects.
+</p>
 
-  <h2>Recent projects</h2>
-  {% if projects %}
-    <ul>
-      {% for project in projects %}
-        <li>
-          <a href="{{ url_for('main.list_projects') }}">{{ project.name }}</a>
-          (created {{ project.created_at.strftime('%Y-%m-%d') }})
-        </li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p>No projects yet. <a href="{{ url_for('main.create_project') }}">Create one</a>.</p>
-  {% endif %}
+<h2>Recent projects</h2>
+{% if projects %}
+<table class="data-table">
+  <tr>
+    <th>Name</th>
+    <th>Created</th>
+  </tr>
+  {% for project in projects %}
+  <tr>
+    <td>
+      <a href="{{ url_for('main.list_testcases', project_id=project.id) }}">
+        {{ project.name }}
+      </a>
+    </td>
+    <td>{{ project.created_at.strftime('%Y-%m-%d') }}</td>
+  </tr>
+  {% endfor %}
+</table>
+<p>
+  <a class="btn btn-primary" href="{{ url_for('main.list_projects') }}">
+    View all projects
+  </a>
+</p>
+{% else %}
+<p>No projects yet.</p>
+<a class="btn btn-primary" href="{{ url_for('main.create_project') }}">
+  Create your first project
+</a>
+{% endif %}
 {% endblock %}
