@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}{{ action }} Test case{% endblock %}
 {% block content %}
-  <h1>{{ action }} test case for project: {{ project.name }}</h1>
+  <h1>{{ "Edit" if testcase is defined else "Create" }} test case for project: {{ project.name }}</h1>
 
   <form method="post">
     <label>Title:<br>
@@ -35,7 +35,9 @@
       </label><br><br>
     {% endif %}
 
-    <button type="submit">{{ action }}</button>
+    <button type="submit">
+       {{ "Save changes" if testcase is defined else "Create" }}
+    </button>
     <a href="{{ url_for('main.list_testcases', project_id=project.id) }}">Cancel</a>
   </form>
 {% endblock %}

@@ -1,47 +1,49 @@
 {% extends "base.html" %}
 {% block title %}Defects - {{ project.name }}{% endblock %}
 {% block content %}
-  <h1>Defects for project: {{ project.name }}</h1>
+<h1>Defects for project: {{ project.name }}</h1>
 
-  <p>
-    <a href="{{ url_for('main.create_defect', project_id=project.id) }}">Log new defect</a> |
-    <a href="{{ url_for('main.list_projects') }}">Back to projects</a>
-  </p>
+<p>
+  <a href="{{ url_for('main.create_defect', project_id=project.id) }}">Log new defect</a> |
+  <a href="{{ url_for('main.list_projects') }}">Back to projects</a>
+</p>
 
-  {% if defects %}
-    <table border="1" cellpadding="4">
-      <tr>
-        <th>Title</th>
-        <th>Severity</th>
-        <th>Status</th>
-        <th>Test case</th>
-        <th>Actions</th>
-      </tr>
-      {% for d in defects %}
-        <tr>
-          <td>{{ d.title }}</td>
-          <td>{{ d.severity }}</td>
-          <td>{{ d.status }}</td>
-          <td>
-            {% if d.test_case %}
-              {{ d.test_case.title }}
-            {% else %}
-              (none)
-            {% endif %}
-          </td>
-          <td>
-            <a href="{{ url_for('main.edit_defect', defect_id=d.id) }}">Edit</a>
-            <form action="{{ url_for('main.delete_defect', defect_id=d.id) }}"
-                  method="post"
-                  style="display:inline"
-                  onsubmit="return confirm('Delete this defect?');">
-              <button type="submit">Delete</button>
-            </form>
-          </td>
-        </tr>
-      {% endfor %}
-    </table>
-  {% else %}
-    <p>No defects logged for this project.</p>
-  {% endif %}
+{% if defects %}
+<table border="1" cellpadding="4">
+  <tr>
+    <th>Title</th>
+    <th>Severity</th>
+    <th>Status</th>
+    <th>Test case</th>
+    <th>Actions</th>
+  </tr>
+  {% for d in defects %}
+  <tr>
+    <td>{{ d.title }}</td>
+    <td>{{ d.severity }}</td>
+    <td>{{ d.status }}</td>
+    <td>
+      {% if d.test_case %}
+      {{ d.test_case.title }}
+      {% else %}
+      (none)
+      {% endif %}
+    </td>
+    <td>
+      <a href="{{ url_for('main.edit_defect', defect_id=d.id) }}">Edit</a>
+
+      {% if current_user.role == "admin" or current_user.id == d.created_by %}
+      <form action="{{ url_for('main.delete_defect', defect_id=d.id) }}" method="post" style="display:inline"
+        onsubmit="return confirm('Delete this defect?');">
+        <button type="submit">Delete</button>
+      </form>
+      {% endif %}
+    </td>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<p>No defects logged for this project.</p>
+{% endif %}
 {% endblock %}

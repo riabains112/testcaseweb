@@ -1,8 +1,9 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_required, current_user
-from .permissions import admin_required
+
 from . import db
 from .models import Project, TestCase, Defect
+from .permissions import admin_required
 
 main_bp = Blueprint("main", __name__)
 
@@ -10,7 +11,7 @@ main_bp = Blueprint("main", __name__)
 @main_bp.route("/")
 @login_required
 def index():
-    # simple dashboard that links to projects
+    """Dashboard showing recent projects."""
     projects = Project.query.order_by(Project.created_at.desc()).limit(5).all()
     return render_template("index.html", user=current_user, projects=projects)
 
@@ -72,12 +73,9 @@ def edit_project(project_id):
 
 @main_bp.route("/projects/<int:project_id>/delete", methods=["POST"])
 @login_required
+@admin_required
 def delete_project(project_id):
-    # Only admins can delete projects
-    if current_user.role != "admin":
-        flash("Only admins can delete projects.", "danger")
-        return redirect(url_for("main.list_projects"))
-
+    """Only admins can delete projects."""
     project = Project.query.get_or_404(project_id)
     db.session.delete(project)
     db.session.commit()
@@ -140,7 +138,7 @@ def create_testcase(project_id):
 @login_required
 def edit_testcase(testcase_id):
     testcase = TestCase.query.get_or_404(testcase_id)
-    project = testcase.project  # via relationship
+    project = testcase.project  # relationship from models
 
     if request.method == "POST":
         title = request.form.get("title")
@@ -183,6 +181,7 @@ def delete_testcase(testcase_id):
     db.session.commit()
     flash("Test case deleted.", "success")
     return redirect(url_for("main.list_testcases", project_id=project_id))
+
 
 # ---------- DEFECT ROUTES ----------
 
@@ -246,7 +245,7 @@ def edit_defect(defect_id):
     project = defect.project
     testcases = TestCase.query.filter_by(project_id=project.id).all()
 
-       if request.method == "POST":
+    if request.method == "POST":
         title = request.form.get("title")
         description = request.form.get("description")
         severity = request.form.get("severity")
@@ -257,7 +256,7 @@ def edit_defect(defect_id):
             flash("Defect title must be at least 5 characters.", "danger")
             return redirect(url_for("main.edit_defect", defect_id=defect.id))
 
-        # Simple business rule: defect should be fixed before it can be closed
+        # Business rule: defect should be fixed before it can be closed
         if status == "closed" and defect.status != "fixed":
             flash(
                 "Defect must be marked as 'fixed' before it can be closed.",
@@ -299,13 +298,3 @@ def delete_defect(defect_id):
     db.session.commit()
     flash("Defect deleted.", "success")
     return redirect(url_for("main.list_defects", project_id=project_id))
-
-@main_bp.route("/projects/<int:project_id>/delete", methods=["POST"])
-@login_required
-@admin_required
-def delete_project(project_id):
-    project = Project.query.get_or_404(project_id)
-    db.session.delete(project)
-    db.session.commit()
-    flash("Project deleted.", "success")
-    return redirect(url_for("main.list_projects"))

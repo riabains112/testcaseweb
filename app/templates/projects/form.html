@@ -13,7 +13,9 @@
       <textarea name="description" rows="4" cols="40">{{ project.description if project is defined else '' }}</textarea>
     </label><br><br>
 
-    <button type="submit">{{ action }}</button>
+    <button type="submit">
+       {{ "Save changes" if project is defined else "Create" }}
+    </button>
     <a href="{{ url_for('main.list_projects') }}">Cancel</a>
   </form>
 {% endblock %}

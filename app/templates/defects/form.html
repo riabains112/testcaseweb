@@ -1,7 +1,8 @@
 {% extends "base.html" %}
-{% block title %}{{ action }} defect{% endblock %}
 {% block content %}
-  <h1>{{ action }} defect for project: {{ project.name }}</h1>
+{% block title %}{{ "Edit" if defect is defined else "Create" }} defect{% endblock %}
+<h1>{{ "Edit" if defect is defined else "Create" }} defect for project: {{ project.name }}</h1>
+
 
   <form method="post">
     <label>Title:<br>
@@ -48,7 +49,9 @@
       </select>
     </label><br><br>
 
-    <button type="submit">{{ action }}</button>
+    <button type="submit">
+       {{ "Save changes" if defect is defined else "Create" }}
+    </button>
     <a href="{{ url_for('main.list_defects', project_id=project.id) }}">Cancel</a>
   </form>
 {% endblock %}
