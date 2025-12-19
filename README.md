@@ -27,6 +27,11 @@ Built to reflect a QA workflow in a mobile banking context (tester ↔ developer
 
 ---
 
+# First-time setup (creates tables)
+python -c "from app import create_app, db; app=create_app(); app.app_context().push(); db.create_all()"
+
+---
+
 ## Roles & Permissions (summary)
 
 - **Admin**
